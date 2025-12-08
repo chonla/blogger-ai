@@ -1,0 +1,17 @@
+[tools]
+python = "3.14.0"
+
+[env]
+_.file = { path = ".env", redact = true }
+WRITER_LLM = "google://gemini-2.5-flash"
+EDITOR_LLM = "openai://gpt-4.1-mini"
+SEO_LLM = "google://gemini-2.5-flash"
+#WRITER_LLM = "ollama://mistral-nemo:12b"
+#EDITOR_LLM = "ollama://gemma3:12b"
+#SEO_LLM = "ollama://gemma3:12b"
+REVIEW_LIMIT = "5"
+MINIMUM_QUALITY_SCORE = "4.5"
+OLLAMA_API_BASE_URL = "http://localhost:11434"
+
+[tasks.start]
+run = "python cli.py"
