@@ -1,17 +1,28 @@
 [tools]
-python = "3.14.0"
+python = "3.14.2"
 
 [env]
 _.file = { path = ".env", redact = true }
-WRITER_LLM = "google://gemini-2.5-flash"
-EDITOR_LLM = "openai://gpt-4.1-mini"
-SEO_LLM = "google://gemini-2.5-flash"
-#WRITER_LLM = "ollama://mistral-nemo:12b"
-#EDITOR_LLM = "ollama://gemma3:12b"
-#SEO_LLM = "ollama://gemma3:12b"
-REVIEW_LIMIT = "5"
+LOG_LEVEL = "debug"
+CURL_VERBOSE = "true"
+BLOG_REVIEW_LIMIT = "5"
 MINIMUM_QUALITY_SCORE = "4.5"
 OLLAMA_API_BASE_URL = "http://localhost:11434"
+CONNECTION_TIMEOUT_SECONDS = "30"
+OPERATION_TIMEOUT_SECONDS = "120"
+# Available models
+# google://gemini-3-pro-preview
+# google://gemini-2.5-flash
+# openai://gpt-4.1-mini
+# openai://gpt-5-mini
+# ollama://mistral-nemo:12b"
+# ollama://gemma3:12b
+WRITER_LLM = "google://gemini-2.5-flash"
+EDITOR_LLM = "openai://gpt-4.1-mini"
+SEO_LLM = "openai://gpt-4.1-mini"
+#WRITER_LLM = "ollama://scb10x/typhoon2.5-qwen3-4b"
+#EDITOR_LLM = "ollama://gemma3:12b"
+#SEO_LLM = "ollama://gemma3:12b"
 
 [tasks.start]
 run = "python cli.py"

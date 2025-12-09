@@ -1,6 +1,7 @@
+import json
 import time
 from agent.llm.factory import create_llm
-from json_object.extractor import extract_json_objects
+from extractor.json_object import extract_json_objects
 from logger.logger import Logger
 from pen.pen import pen
 
@@ -33,20 +34,15 @@ OUTPUT CONSTRAINTS:
 
     def create_metadata(self, content):
         self.logger.log("Creating metadata for content ...")
-
-        start_of_content_writing_time = time.time()
         resp = self.agent.send_message(
             f"""Generate a metadata for the following content draft, following the PROFESSIONAL CONTENT MANDATE, and OUTPUT CONSTRAINTS provided in your system instructions:
 
 START OF CONTENT DRAFT--------------
 {content}
 END OF CONTENT DRAFT----------------""")
-        end_of_content_writing_time = time.time()
-        self.logger.log_time_taken(end_of_content_writing_time - start_of_content_writing_time)
-
         json_data = extract_json_objects(resp)
 
-        return json_data[0]
+        return json.loads(json_data[0])
 
     def name(self):
         return self.agent.model_name

@@ -1,9 +1,9 @@
 import json
 from agent.llm.factory import create_llm
+from extractor.section import extract_section
 from pen.pen import pen
 from logger.logger import Logger
-import time
-from json_object.extractor import extract_json_objects
+from extractor.json_object import extract_json_objects
 
 
 class EditorAgent():
@@ -52,43 +52,19 @@ START OF CONTENT DRAFT--------------
 {content}
 END OF CONTENT DRAFT----------------"""
         
-        start_of_content_writing_time = time.time()
         feedback = self.agent.send_message(entry_submission)
-        end_of_content_writing_time = time.time()
-        self.logger.log_time_taken(end_of_content_writing_time - start_of_content_writing_time)
-        result = self.parse_feedback(feedback)
-        return result
-    
-    def parse_feedback(self, feedback_str):
-        feedback_sections = feedback_str.split("**START OF")
-        sections = {
-            "score": {},
-            "overall_score": "",
-            "suggested_feedback": "",
-            "others": ""
-        }
         
-        for feedback_section in feedback_sections:
-            if "FEEDBACK JSON**" in feedback_section:
-                json_data = extract_json_objects(feedback_section)
-                sections["score"] = json.loads(json_data[0])
-            elif "SUGGESTED FEEDBACK**" in feedback_section:
-                sections["suggested_feedback"] = feedback_section.replace("SUGGESTED FEEDBACK**", "").strip()
-                if "**END OF " in sections["suggested_feedback"]:
-                    sections["suggested_feedback"] = sections["suggested_feedback"].split("**END OF ")[0].strip()
-            elif "OVERALL SCORE**" in feedback_section:
-                sections["overall_score"] = feedback_section.replace("OVERALL SCORE**", "").strip()
-                if "**END OF " in sections["overall_score"]:
-                    sections["overall_score"] = sections["overall_score"].split("**END OF ")[0].strip()
-            else:
-                sections["others"] = feedback_section.strip()
-                if "**END OF " in sections["others"]:
-                    sections["others"] = sections["others"].split("**END OF ")[0].strip()
-                
-        self.logger.log(json.dumps(sections, ensure_ascii=False, indent=2))
-
-        return {
-            "score": sections["score"],
-            "overall_score": sections["overall_score"],
-            "suggested_feedback": sections["suggested_feedback"]
+        score_json_str = extract_section(feedback, "FEEDBACK JSON")
+        if score_json_str == "":
+            score_json = extract_json_objects(feedback)
+        else:
+            score_json = extract_json_objects(score_json_str)
+        overall_score = extract_section(feedback, "OVERALL SCORE")
+        suggested_feedback = extract_section(feedback, "SUGGESTED FEEDBACK")
+        
+        result = {
+            "score": json.loads(score_json[0]),
+            "overall_score": overall_score,
+            "suggested_feedback": suggested_feedback
         }
+        return result

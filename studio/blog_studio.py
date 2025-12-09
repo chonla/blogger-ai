@@ -17,6 +17,8 @@ class BlogStudio:
         self.logger = Logger("studio", pen.cyan_bright)
         
     def create_blog_post(self, topic: str):
+        candidate = None
+
         review_limit = int(os.getenv("BLOG_REVIEW_LIMIT", "5"))
         quality_threshold = float(os.getenv("MINIMUM_QUALITY_SCORE", "4.5"))
         self.logger.log(f"writer: {pen.yellow_bright(self.writer.name())}")
@@ -29,33 +31,62 @@ class BlogStudio:
         self.logger.log(f"Starting blog post creation for topic: {pen.yellow_bright(topic)}")
         draft = self.writer.write_content(topic)
         
-        self.logger.log_block("SUBMITTED DRAFT", pen.gray(draft))
+        self.logger.debug_block("SUBMITTED DRAFT", draft)
         
         self.logger.log("Draft created. Initiating review ...")
         result = self.editor.review_content(draft)
-        self.logger.log_block("FEEDBACK", pen.gray(result["suggested_feedback"]))
+        self.logger.debug_block("FEEDBACK", result["suggested_feedback"])
         flawless = result["score"]['flawless']
         content_quality = result["score"]['average_score']
         self.logger.log(f"Writer received average score: {content_quality}")
+
+        if content_quality >= quality_threshold or flawless:
+            candidate = {
+                "content": draft,
+                "score": content_quality,
+                "flawless": flawless
+            }
 
         revision_round = 1
         while not flawless and revision_round <= review_limit:
             self.logger.log(f"Revision round {revision_round} ...")
             draft = self.writer.revise_content(result["overall_score"], result["suggested_feedback"])
-            self.logger.log_block("RESUBMITTED DRAFT", pen.gray(draft))
+            self.logger.debug_block("RESUBMITTED DRAFT", draft)
 
             result = self.editor.review_content(draft)
-            self.logger.log_block("FEEDBACK", pen.gray(result["suggested_feedback"]))
+            self.logger.debug_block("FEEDBACK", result["suggested_feedback"])
             
             flawless = result["score"]['flawless']
             content_quality = result["score"]['average_score']
             self.logger.log(f"Writer received average score: {content_quality}")
+            
+            if content_quality >= quality_threshold or flawless:
+                if candidate is None:
+                    candidate = {
+                        "content": draft,
+                        "score": content_quality,
+                        "flawless": flawless
+                    }
+                else:
+                    # Keep the best candidate
+                    if content_quality > candidate["score"]:
+                        candidate = {
+                            "content": draft,
+                            "score": content_quality,
+                            "flawless": flawless
+                        }
             revision_round += 1
 
-        if content_quality < quality_threshold:
-            self.logger.log(f"Warning: Final content quality score {content_quality} is below threshold {quality_threshold}.")
-        else:
-            self.logger.log("Blog post creation completed and approved!")
+        if candidate is not None:
+            draft = candidate["content"]
+            content_quality = candidate["score"]
+            flawless = candidate["flawless"]
+            if flawless:
+                self.logger.log(f"Content automatically approved with flawless score! Awesome job!")
+            else:
+                self.logger.log(f"Content automatically approved with score below flawless threshold.")
             metadata = self.seo.create_metadata(draft)
             self.publisher.publish(draft, metadata)
-        return draft
+        else:
+            self.logger.log("Failed to produce acceptable content within the review limit.")
+        return candidate

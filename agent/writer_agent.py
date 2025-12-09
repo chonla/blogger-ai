@@ -1,5 +1,7 @@
+import re
 import time
 from agent.llm.factory import create_llm
+from extractor.section import extract_section
 from pen.pen import pen
 from logger.logger import Logger
 
@@ -12,7 +14,7 @@ PROFESSIONAL CONTENT MANDATE:
 1.  Tone & Voice: Adopt an authoritative, engaging, and trustworthy tone. Maintain 100% originality and a sophisticated, human-like flow.
 2.  Depth & Value: All articles must provide deep, comprehensive value (cornerstone content) that fully answers the user's query ("10x Content"). The content must be as long as necessary to fully satisfy search intent. Avoid superficial or generic filler.
 3.  Readability for Ads: Content must be exceptionally scannable to ensure high time-on-page despite ad placements.
-    * Use clear, scannable Markdown formatting. Use one main ## heading (the title) and numerous, well-structured ### and #### subheadings.
+    * Use clear, scannable Markdown formatting. Use one main # heading (the title) and numerous, well-structured ## and ### subheadings.
     * **Keep all paragraphs short (3-4 sentences maximum)** to break up the text, allowing for natural ad placement between blocks.
     * Use **bolding** for key concepts, bulleted (*), and numbered lists frequently for readability.
     * Include a strong Introduction and a Conclusion/Call-to-Action.
@@ -22,7 +24,7 @@ PROFESSIONAL CONTENT MANDATE:
 7.  Language: The content must be in {preferred_language}, written in fluent and natural language. Avoid jargon unless necessary, and explain complex terms simply.
 
 SEO PROTOCOL (MAXIMIZING TRAFFIC):
-1.  Keyword Strategy: For a given Primary Keyword ([PK]), generate content that is naturally optimized. The [PK] must be in: a) The Title (##), b) The Introduction (first 100 words), c) At least two subheadings (###), d) The Conclusion, and e) The body text, with a density of 0.8% to 1.5%.
+1.  Keyword Strategy: For a given Primary Keyword ([PK]), generate content that is naturally optimized. The [PK] must be in: a) The Title (#), b) The Introduction (first 100 words), c) At least two subheadings (##), d) The Conclusion, and e) The body text, with a density of 0.8% to 1.5%.
 2.  Semantic SEO: Incorporate a variety of Long-Tail Keywords (LTKs) and Latent Semantic Indexing (LSI) Keywords naturally to cover the topic comprehensively, attracting broader traffic.
 3.  Search Intent Alignment: Always analyze the implied search intent of the [PK] and structure the content to fully satisfy that intent, which is key to lowering bounce rate and increasing time-on-page.
 
@@ -43,20 +45,13 @@ OUTPUT CONSTRAINTS:
 
     def write_content(self, topic):
         self.logger.log(f"Writing content for topic: {pen.yellow_bright(topic)} ...")
-
-        start_of_content_writing_time = time.time()
         content = self.agent.send_message(f"Write a blog entry about \"{topic}\" following the PROFESSIONAL CONTENT MANDATE, SEO PROTOCOL, AD REVENUE OPTIMIZATION FOCUS, ARTICLE STRUCTURE, and OUTPUT CONSTRAINTS provided in your system instructions.")
-        end_of_content_writing_time = time.time()
-        self.logger.log_time_taken(end_of_content_writing_time - start_of_content_writing_time)
-
-        if "**START OF METADATA**" in content:
-            content = content.split("**START OF METADATA**")[0].strip()
-        if "**START OF ARTICLE**" in content:
-            content = content.split("**START OF ARTICLE**")[1].strip()
+        content = extract_section(content, "ARTICLE")
         return content
     
     def revise_content(self, overall_score, feedback):
         self.logger.log("Revising content based on editor feedback ...")
+        start_of_content_writing_time = time.time()
         revised_content = self.agent.send_message(
             f"""Revise the content draft recently submitted based on the following editor feedback, using the score in the feedback to guide your revisions:\n
             
@@ -66,4 +61,8 @@ OVERALL SCORE TO LAST SUBMISSION:
 EDITOR FEEDBACK TO LAST SUBMISSION:
 {feedback}"""
         )
+        end_of_content_writing_time = time.time()
+        self.logger.log_time_taken(end_of_content_writing_time - start_of_content_writing_time)
+
+        revised_content = extract_section(revised_content, "ARTICLE")
         return revised_content
