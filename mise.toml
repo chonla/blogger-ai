@@ -17,7 +17,7 @@ CONNECTION_TIMEOUT_SECONDS = "30"
 OPERATION_TIMEOUT_SECONDS = "120"
 WRITER_LLM = "google://gemini-2.5-flash"
 EDITOR_LLM = "openai://gpt-4.1-mini"
-SEO_LLM = "openai://gpt-4.1-mini"
+MARKETER_LLM = "openai://gpt-4.1-mini"
 
 [tasks.start]
 run = "python cli.py"

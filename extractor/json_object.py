@@ -1,4 +1,4 @@
-def extract_json_objects(text):
+def extract_json_objects(text) -> list[str]:
     objs = []
     brace_level = 0
     start = None

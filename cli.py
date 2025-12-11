@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from profiles.profiles import profiles
 from publisher.screen import ScreenPublisher
 from studio.editor_agent import EditorAgent
-from studio.marketer_agent import SEOAgent
+from studio.marketer_agent import MarketerAgent
 from studio.writer_agent import WriterAgent
 # from publisher.markdown import MarkdownPublisher
 from studio.studio import Studio
@@ -25,17 +25,17 @@ if __name__ == "__main__":
     editor_llm = use_model(os.getenv("EDITOR_LLM", "ollama://llama2:13b"))
     editor_llm.with_instruction(profiles["bob"].instruction())
     
-    seo_llm = use_model(os.getenv("SEO_LLM", "ollama://llama2:13b"))
-    seo_llm.with_instruction(profiles["carol"].instruction())
+    marketer_llm = use_model(os.getenv("MARKETER_LLM", "ollama://llama2:13b"))
+    marketer_llm.with_instruction(profiles["carol"].instruction())
     
     writer_agent = WriterAgent(writer_llm)
     editor_agent = EditorAgent(editor_llm)
-    seo_agent = SEOAgent(seo_llm)
+    marketer_agent = MarketerAgent(marketer_llm)
     
     blog_studio = Studio(
         writer=writer_agent,
         editor=editor_agent,
-        seo=seo_agent,
+        marketer=marketer_agent,
         log_level=log_level
     )
     content = blog_studio.create_entry(blog_topic, blog_language)

@@ -8,5 +8,5 @@ class Publisher:
         pass
     
     @abstractmethod
-    def name(self):
+    def name(self) -> str:
         pass

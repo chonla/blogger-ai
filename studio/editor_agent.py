@@ -11,10 +11,10 @@ class EditorAgent():
         self.llm = llm
         self.logger = Logger("editor", pen.green_bright, log_level)
 
-    def name(self):
+    def name(self) -> str:
         return self.llm.model_name
 
-    def review_content(self, content):
+    def review_content(self, content: str) -> dict:
         self.logger.log("Reviewing content draft ...")
         entry_submission = f"""The content draft below has been submitted in JSON format. Please review the following content, focusing on title and body, and provide your detailed feedback and suggested edits to enhance its quality:
 START OF CONTENT DRAFT--------------

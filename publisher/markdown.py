@@ -8,7 +8,7 @@ class MarkdownPublisher(Publisher):
     def __init__(self):
         self.logger = Logger("publisher", pen.magenta_bright)
         
-    def name(self):
+    def name(self) -> str:
         return "markdown publisher"
     
     def publish(self, content: str, metadata: Dict):

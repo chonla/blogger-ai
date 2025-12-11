@@ -1,7 +1,7 @@
 import re
 
 
-def extract_section(text, section_title):
+def extract_section(text, section_title) -> str:
     section_start_pattern = re.compile(rf"(\*\*)?START OF {section_title}(\*\*)?")
     section_end_pattern = re.compile(rf"(\*\*)?END OF {section_title}(\*\*)?")
     other_section_start_pattern = re.compile(r"(\*\*)?START OF [A-Z ]+(\*\*)?")

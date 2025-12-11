@@ -1,7 +1,7 @@
 import json
 import os
 from .editor_agent import EditorAgent
-from .marketer_agent import SEOAgent
+from .marketer_agent import MarketerAgent
 from .writer_agent import WriterAgent
 from publisher.markdown import MarkdownPublisher
 from logger.logger import Logger
@@ -9,20 +9,20 @@ from pen.pen import pen
 
 
 class Studio:
-    def __init__(self, writer: WriterAgent, editor: EditorAgent, seo: SEOAgent, log_level: str = "INFO"):
+    def __init__(self, writer: WriterAgent, editor: EditorAgent, marketer: MarketerAgent, log_level: str = "INFO"):
         self.writer = writer
         self.editor = editor
-        self.seo = seo
+        self.marketer = marketer
         self.logger = Logger("studio", pen.cyan_bright, log_level)
         
-    def create_entry(self, topic: str, preferred_language: str):
+    def create_entry(self, topic: str, preferred_language: str) -> dict | None:
         candidate = None
 
         review_limit = int(os.getenv("BLOG_REVIEW_LIMIT", "5"))
         quality_threshold = float(os.getenv("MINIMUM_QUALITY_SCORE", "4.5"))
         self.logger.log(f"writer: {pen.yellow_bright(self.writer.name())}")
         self.logger.log(f"editor: {pen.yellow_bright(self.editor.name())}")
-        self.logger.log(f"seo: {pen.yellow_bright(self.seo.name())}")
+        self.logger.log(f"marketer: {pen.yellow_bright(self.marketer.name())}")
         self.logger.log(f"minimum quality score: {pen.yellow_bright(str(quality_threshold))}")
         self.logger.log(f"review limit: {pen.yellow_bright(str(review_limit))}")
 
@@ -83,7 +83,7 @@ class Studio:
                 self.logger.log(f"Content automatically approved with flawless score! Awesome job!")
             else:
                 self.logger.log(f"Content automatically approved with score below flawless threshold.")
-            metadata = self.seo.create_metadata(draft)
+            metadata = self.marketer.create_metadata(draft)
             return { "content": draft, "metadata": metadata }
         self.logger.log("Failed to produce acceptable content within the review limit.")
         return None

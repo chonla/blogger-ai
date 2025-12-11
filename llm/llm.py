@@ -20,7 +20,7 @@ class LLM:
         self.curl_verbose = 0 if os.getenv("CURL_VERBOSE", "false").upper() == "FALSE" else 1
         self.system_instruction = ""
 
-    def chat(self, payload):
+    def chat(self, payload) -> dict:
         start_of_content_writing_time = time.time()
         curl_client = pycurl.Curl()
         curl_client.setopt(pycurl.CONNECTTIMEOUT, self.connection_timeout_seconds)
