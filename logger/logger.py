@@ -7,7 +7,10 @@ class Logger:
     def __init__(self, namespace: str, color: callable):
         self.namespace = namespace
         self.color = color
-        self.log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+        self.log_level = self.set_level(os.getenv("LOG_LEVEL", "INFO"))
+        
+    def set_level(self, level: str):
+        self.log_level = level.upper()
         
     def debug(self, message: str):
         if self.log_level == "DEBUG":

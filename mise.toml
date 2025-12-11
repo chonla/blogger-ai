@@ -26,3 +26,6 @@ SEO_LLM = "openai://gpt-4.1-mini"
 
 [tasks.start]
 run = "python cli.py"
+
+[tasks.test]
+run = "python -m unittest discover -s tests"
