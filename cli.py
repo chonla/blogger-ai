@@ -22,4 +22,4 @@ if __name__ == "__main__":
     publisher = MarkdownPublisher()
     
     studio = BlogStudio(writer, editor, seo, publisher)
-    studio.create_blog_post("AI-Power Rubber Duck Debugging: Avoiding the Hallucination Pitfalls")
+    studio.create_blog_post("Next generation of rubber duck debugging")

@@ -1,6 +1,6 @@
 import json
 import time
-from agent.llm.factory import create_llm
+from llm.factory import create_llm
 from extractor.json_object import extract_json_objects
 from logger.logger import Logger
 from pen.pen import pen

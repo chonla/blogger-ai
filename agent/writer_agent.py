@@ -1,6 +1,6 @@
 import re
 import time
-from agent.llm.factory import create_llm
+from llm.factory import create_llm
 from extractor.section import extract_section
 from pen.pen import pen
 from logger.logger import Logger
@@ -51,7 +51,6 @@ OUTPUT CONSTRAINTS:
     
     def revise_content(self, overall_score, feedback):
         self.logger.log("Revising content based on editor feedback ...")
-        start_of_content_writing_time = time.time()
         revised_content = self.agent.send_message(
             f"""Revise the content draft recently submitted based on the following editor feedback, using the score in the feedback to guide your revisions:\n
             
@@ -61,8 +60,6 @@ OVERALL SCORE TO LAST SUBMISSION:
 EDITOR FEEDBACK TO LAST SUBMISSION:
 {feedback}"""
         )
-        end_of_content_writing_time = time.time()
-        self.logger.log_time_taken(end_of_content_writing_time - start_of_content_writing_time)
 
         revised_content = extract_section(revised_content, "ARTICLE")
         return revised_content

@@ -1,5 +1,5 @@
 import json
-from agent.llm.factory import create_llm
+from llm.factory import create_llm
 from extractor.section import extract_section
 from pen.pen import pen
 from logger.logger import Logger

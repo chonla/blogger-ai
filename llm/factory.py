@@ -1,4 +1,4 @@
-from agent.llm.llm import LLM
+from llm.llm import LLM
 
 
 def create_llm(llm: str, system_instruction: str = None) -> LLM:
