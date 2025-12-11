@@ -4,16 +4,15 @@ from pen.pen import pen
 
 
 class OpenAI(LLM):
-    def __init__(self, model_name: str, system_instruction: str = None):
+    def __init__(self, model_name: str):
         super().__init__(
-            agent_name="openai",
-            agent_color=pen.yellow_bright,
+            provider_name="openai",
+            provider_color=pen.yellow_bright,
             url=f"https://api.openai.com/v1/chat/completions",
             headers={ "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}" },
             connection_timeout_seconds=int(os.getenv('CONNECTION_TIMEOUT_SECONDS', "15")),
             operation_timeout_seconds=int(os.getenv('OPERATION_TIMEOUT_SECONDS', "30"))
         )
-        self.system_instruction = system_instruction
         self.history = []
         self.model_name = model_name
 

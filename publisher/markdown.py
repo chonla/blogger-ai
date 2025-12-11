@@ -1,13 +1,18 @@
 from typing import Dict
 from logger.logger import Logger
 from pen.pen import pen
+from .publisher import Publisher
 
 
-class MarkdownPublisher:
+class MarkdownPublisher(Publisher):
     def __init__(self):
         self.logger = Logger("publisher", pen.magenta_bright)
+        
+    def name(self):
+        return "markdown publisher"
     
     def publish(self, content: str, metadata: Dict):
+        self.logger.log(f"publishing with {pen.yellow_bright(self.name())}")
         file_path = metadata.get("suggested_url_slug", "blog_post").replace(" ", "_") + ".md"
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)

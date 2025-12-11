@@ -4,10 +4,10 @@ from pen.pen import pen
 
 
 class Logger:
-    def __init__(self, namespace: str, color: callable):
+    def __init__(self, namespace: str, color: callable, log_level: str = "INFO"):
         self.namespace = namespace
         self.color = color
-        self.log_level = self.set_level(os.getenv("LOG_LEVEL", "INFO"))
+        self.set_level(log_level)
         
     def set_level(self, level: str):
         self.log_level = level.upper()

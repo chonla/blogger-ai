@@ -1,22 +1,21 @@
 import json
 import os
-from agent.editor_agent import EditorAgent
-from agent.seo_agent import SEOAgent
-from agent.writer_agent import WriterAgent
+from .editor_agent import EditorAgent
+from .marketer_agent import SEOAgent
+from .writer_agent import WriterAgent
 from publisher.markdown import MarkdownPublisher
 from logger.logger import Logger
 from pen.pen import pen
 
 
-class BlogStudio:
-    def __init__(self, writer: WriterAgent, editor: EditorAgent, seo: SEOAgent, publisher: MarkdownPublisher):
+class Studio:
+    def __init__(self, writer: WriterAgent, editor: EditorAgent, seo: SEOAgent, log_level: str = "INFO"):
         self.writer = writer
         self.editor = editor
         self.seo = seo
-        self.publisher = publisher
-        self.logger = Logger("studio", pen.cyan_bright)
+        self.logger = Logger("studio", pen.cyan_bright, log_level)
         
-    def create_blog_post(self, topic: str):
+    def create_entry(self, topic: str, preferred_language: str):
         candidate = None
 
         review_limit = int(os.getenv("BLOG_REVIEW_LIMIT", "5"))
@@ -24,12 +23,11 @@ class BlogStudio:
         self.logger.log(f"writer: {pen.yellow_bright(self.writer.name())}")
         self.logger.log(f"editor: {pen.yellow_bright(self.editor.name())}")
         self.logger.log(f"seo: {pen.yellow_bright(self.seo.name())}")
-        self.logger.log(f"publisher: {pen.yellow_bright('MarkdownPublisher')}")
         self.logger.log(f"minimum quality score: {pen.yellow_bright(str(quality_threshold))}")
         self.logger.log(f"review limit: {pen.yellow_bright(str(review_limit))}")
 
         self.logger.log(f"Starting blog post creation for topic: {pen.yellow_bright(topic)}")
-        draft = self.writer.write_content(topic)
+        draft = self.writer.write_content(topic, preferred_language)
         
         self.logger.debug_block("SUBMITTED DRAFT", draft)
         
@@ -86,7 +84,6 @@ class BlogStudio:
             else:
                 self.logger.log(f"Content automatically approved with score below flawless threshold.")
             metadata = self.seo.create_metadata(draft)
-            self.publisher.publish(draft, metadata)
-        else:
-            self.logger.log("Failed to produce acceptable content within the review limit.")
-        return candidate
+            return { "content": draft, "metadata": metadata }
+        self.logger.log("Failed to produce acceptable content within the review limit.")
+        return None

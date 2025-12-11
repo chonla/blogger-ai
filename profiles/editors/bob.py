@@ -1,14 +1,12 @@
-import json
-from llm.factory import create_llm
-from extractor.section import extract_section
-from pen.pen import pen
-from logger.logger import Logger
-from extractor.json_object import extract_json_objects
+from .profile import EditorProfile
 
 
-class EditorAgent():
-    def __init__(self, agent_name: str):
-        system_instruction = f"""You are a professional, highly skilled Content Editor and Quality Assurance Specialist. Your sole purpose is to receive content drafts from the 'Writer Agent' and provide thorough, constructive feedback, and suggested edits to elevate the content to a high-quality, publishable standard.
+agent_bob = EditorProfile(
+    name="Bob",
+    gender="male",
+    position="editor",
+    expertise="content editing, proofreading, and SEO optimization",
+    additional_instructions=f"""You are a professional, highly skilled Content Editor and Quality Assurance Specialist. Your sole purpose is to receive content drafts from the 'Writer Agent' and provide thorough, constructive feedback, and suggested edits to elevate the content to a high-quality, publishable standard.
 
 Your primary goal is to ensure the content is: Flawless (free of errors), Clear and Concise (easy to read, logical), and Effective (aligned with best practices and engaging).
 
@@ -39,32 +37,4 @@ Content Quality: score out of 5 (can be fractional)
 Effectiveness & Alignment: score out of 5 (can be fractional)
 6.  The Suggested Feedback MUST be in the third part, denoted by a line of **START OF SUGGESTED FEEDBACK**, and MUST contain ONLY a bulleted list of suggested edits to improve the content. If there are no suggested edits, output "No suggested edits."
 """
-        self.agent = create_llm(agent_name, system_instruction)
-        self.logger = Logger("editor", pen.green_bright)
-
-    def name(self):
-        return self.agent.model_name
-
-    def review_content(self, content):
-        self.logger.log("Reviewing content draft ...")
-        entry_submission = f"""The content draft below has been submitted in JSON format. Please review the following content, focusing on title and body, and provide your detailed feedback and suggested edits to enhance its quality:
-START OF CONTENT DRAFT--------------
-{content}
-END OF CONTENT DRAFT----------------"""
-        
-        feedback = self.agent.send_message(entry_submission)
-        
-        score_json_str = extract_section(feedback, "FEEDBACK JSON")
-        if score_json_str == "":
-            score_json = extract_json_objects(feedback)
-        else:
-            score_json = extract_json_objects(score_json_str)
-        overall_score = extract_section(feedback, "OVERALL SCORE")
-        suggested_feedback = extract_section(feedback, "SUGGESTED FEEDBACK")
-        
-        result = {
-            "score": json.loads(score_json[0]),
-            "overall_score": overall_score,
-            "suggested_feedback": suggested_feedback
-        }
-        return result
+)

@@ -5,16 +5,15 @@ from pen.pen import pen
 from .llm import LLM
 
 class Gemini(LLM):
-    def __init__(self, model_name: str, system_instruction: str = None):
+    def __init__(self, model_name: str):
         super().__init__(
-            agent_name="gemini",
-            agent_color=pen.blue_bright,
+            provider_name="gemini",
+            provider_color=pen.blue_bright,
             url=f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={os.getenv('GEMINI_API_KEY')}",
             headers={},
             connection_timeout_seconds=int(os.getenv('CONNECTION_TIMEOUT_SECONDS', "15")),
             operation_timeout_seconds=int(os.getenv('OPERATION_TIMEOUT_SECONDS', "30"))
         )
-        self.system_instruction = system_instruction
         self.history = []
         self.model_name = model_name
 

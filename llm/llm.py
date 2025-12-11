@@ -10,14 +10,15 @@ from logger.logger import Logger
 
 
 class LLM:
-    def __init__(self, agent_name: str, agent_color: str, url: str, headers: Dict[str, str], connection_timeout_seconds: int = 15, operation_timeout_seconds: int = 20):
+    def __init__(self, provider_name: str, provider_color: str, url: str, headers: Dict[str, str], connection_timeout_seconds: int = 15, operation_timeout_seconds: int = 20):
         self.url = url
         self.headers = { "Content-Type": "application/json" } | headers
         self.model_name = "unnamed-model"
         self.connection_timeout_seconds = connection_timeout_seconds
         self.operation_timeout_seconds = operation_timeout_seconds
-        self.logger = Logger(agent_name, agent_color)
+        self.logger = Logger(provider_name, provider_color)
         self.curl_verbose = 0 if os.getenv("CURL_VERBOSE", "false").upper() == "FALSE" else 1
+        self.system_instruction = ""
 
     def chat(self, payload):
         start_of_content_writing_time = time.time()
@@ -42,6 +43,9 @@ class LLM:
         end_of_content_writing_time = time.time()
         self.logger.log_time_taken(end_of_content_writing_time - start_of_content_writing_time)
         return json.loads(response_data)
+
+    def with_instruction(self, instruction: str):
+        self.system_instruction = instruction
     
     @abstractmethod
     def send_message(self, prompt, preferred_language="English"):
